@@ -46,42 +46,53 @@ CONNECTION DROPS
 
 /* -------------------------------------------------------------------------- */
 
+#define MAXSLV		4
+
+struct slv {
+	struct solver	solvr;
+	int		pool;
+};
+
 struct chl {
 	struct chal	chal;
 	size_t		solved;
+	size_t		nslv;
+	struct slv	slvs[MAXSLV];
 };
 
-/* -------------------------------------------------------------------------- */
-
-static int uq;
-static int solvpool = -1;
-static struct solver solvr;
+static int uq = -1;
+static struct chl mchl;
 
 /* -------------------------------------------------------------------------- */
 
-static void dropchal(struct chl* chl)
+static void dropchal(void)
 {
+	size_t i;
 	struct uevent ue;
 
-	if (0 > solvpool) {
-		return;
+	/* stop solvers */
+	for (i = 0 ; mchl.nslv > i ; i++) {
+		if (0 > mchl.slvs[i].pool) {
+			continue;
+		}
+		solver_stop(mchl.slvs[i].pool);
+		mchl.slvs[i].pool = -1;
 	}
 
-	solver_stop(solvpool);
-	solvpool = -1;
-
-	UQ_SET(&ue, (chl->chal.id - 1), UQFILT_SOLVR, UQ_DELETE, 0, 0, 0);
+	/* stop events reporting */
+	UQ_SET(&ue, (mchl.chal.id - 1), UQFILT_SOLVR, UQ_DELETE, 0, 0, 0);
 	if (0 != uevent(uq, &ue, 1, 0, 0, 0)) {
 		/* we can live with dead memory for a while */
-		eeprintf("Failed to drop challenge %" PRIu64, chl->chal.id);
+		eeprintf("Failed to drop challenge %" PRIu64, mchl.chal.id);
 	}
 }
 
-static int startchal(struct chl* chl)
+static int startchal(void)
 {
+	size_t i;
 	struct uevent ue;
 
-	UQ_SET(&ue, chl->chal.id, UQFILT_SOLVR, (UQ_ADD | UQ_ENABLE), 0, 0, 0);
+	UQ_SET(&ue, mchl.chal.id, UQFILT_SOLVR, (UQ_ADD | UQ_ENABLE), 0, 0, 0);
 	if (0 != uevent(uq, &ue, 1, 0, 0, 0)) {
 		if (EEXIST != errno) {
 			eeprintf("Failed to register for challenge notifications");
@@ -90,26 +101,42 @@ static int startchal(struct chl* chl)
 	}
 
 	iprintf("#%" PRIu64 ",%hhu,%u",
-	        chl->chal.id, chl->chal.type, chl->chal.left);
+	        mchl.chal.id, mchl.chal.type, mchl.chal.left);
 
-	solvr.chl = &chl->chal;
-	solvr.uq  = uq;
-	chl->solved = 0;
-	solvpool = solver_start(&solvr, 1);
+	for (i = 0 ; MAXSLV > i ; i++) {
+		mchl.slvs[i].solvr.chl = &mchl.chal;
+		mchl.slvs[i].solvr.uq = uq;
+		mchl.solved = 0;
+		mchl.slvs[i].pool = solver_start(&mchl.slvs[i].solvr, 1);
+		if (0 > mchl.slvs[i].pool) {
+			break;
+		}
+	}
 
-	return (0 > solvpool) ? -1 : 0;
+	mchl.nslv = i;
+
+	return (0 == i) ? -1 : 0;
 }
 
-static int handle_newchal(char* buf, size_t len, struct chl* chl)
+static int handle_newchal(char* buf, size_t len)
 {
-	if (0 != chal_parse(buf, len, &chl->chal)) {
+	struct chal chal;
+
+	if (0 != chal_parse(buf, len, &chal)) {
 		return -1;
 	}
-	gprintf("New challenge received: %" PRIu64, chl->chal.id);
 
-	dropchal(chl);
+	if (chal.id == mchl.chal.id) {
+		wprintf("Received info for current challenge (ignoring)");
+		return 0;
+	}
 
-	return startchal(chl);
+	memcpy(&mchl.chal, &chal, sizeof(mchl.chal));
+	gprintf("New challenge received: %" PRIu64, mchl.chal.id);
+
+	dropchal();
+
+	return startchal();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -134,13 +161,11 @@ int mine(struct wallet* wl)
 	int sk;
 	int conned;
 	uint64_t n;		/* nonce */
-	struct chl chl;
 	struct uevent ue;
 	char b[MAXMSGLEN];
 
 	iprintf("Starting to mine");
 
-	memset(&chl, 0, sizeof(chl));
 	n = 0; /* fixes compiler warnings */
 
 	goto L_START;
@@ -209,14 +234,14 @@ L_WAIT:
 				goto L_RESTART;
 			}
 			if (0 != strstr(b, "last_solution_hash")) {
-				if (0 != handle_newchal(b, l, &chl)) {
+				if (0 != handle_newchal(b, l)) {
 					eprintf("Failed to start solver");
 					goto L_QUIT;
 				}
 			} else if (0 != strstr(b, "\"error\"")) {
 				wprintf("Received error message: %s", b);
 				/* FIXME see cscoins/issues-13 */
-				chl.solved = 0; /* assume a reset */
+				mchl.solved = 0; /* assume a reset */
 			} else if (0 != strstr(b, "\"submission\"")) {
 				/* ignore */
 			} else {
@@ -224,10 +249,10 @@ L_WAIT:
 			}
 			break;
 		case UQFILT_SOLVR:
-			if (0 != chl.solved) {
+			if (0 != mchl.solved) {
 				wprintf("Ignoring late solution");
 			} else {
-				chl.solved = 1;
+				mchl.solved = 1;
 				n = (uint64_t)(ue.data);
 				if (0 != conned) {
 					if (0 != sendnonce(sk, n, wl)) {
@@ -255,12 +280,17 @@ L_QUIT:
 
 int init_mining(void)
 {
-	if (0 != solver_init(&solvr)) {
-		return -1;
-	}
+	size_t i;
 
 	if (0 > (uq = uqueue())) {
 		return -1;
+	}
+
+	for (i = 0 ; MAXSLV > i ; i++) {
+		if (0 != solver_init(&mchl.slvs[i].solvr)) {
+			gprintf("Failed to initialize solver");
+			return -1;
+		}
 	}
 
 	return 0;
@@ -268,8 +298,13 @@ int init_mining(void)
 
 void exit_mining(void)
 {
+	size_t i;
+
+	for (i = 0 ; MAXSLV > i ; i++) {
+		solver_free(&mchl.slvs[i].solvr);
+	}
+
 	close(uq);
-	solver_free(&solvr);
 }
 
 /* ========================================================================== */
