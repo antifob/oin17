@@ -12,11 +12,16 @@ set -e
 PROGNAME=`basename -- "${0}"`
 
 if [ 0 -eq $# ]; then
-	printf 'usage: %s <out>\n' "${PROGNAME}" >&2
+	printf 'usage: %s <varname>\n' "${PROGNAME}" >&2
 	exit 1
 fi
 
-openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:1024 2>/dev/null
+printf 'const char %s[] = \n' "${1}"
+openssl genpkey \
+	-algorithm RSA \
+	-pkeyopt rsa_keygen_bits:1024 2>/dev/null | \
+	sed -e 's|^|"|' -e 's|$|\\n"|'
+printf ';\n'
 
 ## ========================================================================== ##
 exit $?
