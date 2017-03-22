@@ -182,6 +182,25 @@ static void prq(const struct shortpath* sp)
 
 /* -------------------------------------------------------------------------- */
 
+#ifdef OIN17_DEBUG
+static void dmpgrid(const struct shortpath* sp)
+{
+#if 0
+	size_t x;
+	size_t y;
+
+	for (y = 0 ; sp->size > y ; y++) {
+		for (x = 0 ; sp->size > x ; x++) {
+			printf("%c", sp->grid[indexofxy(x, y, sp->size)]);
+		}
+		putchar('\n');
+	}
+#else
+	(void)sp;
+#endif
+}
+#endif
+
 static size_t indexofxy(size_t x, size_t y, size_t width)
 {
 	return ((y * width) + x);
@@ -221,8 +240,6 @@ getneigh(const struct shortpath* sp, const struct cell* cl, int dir)
 	}
 	return 0;
 }
-
-static void dmpgrid(const struct shortpath*);
 
 static void search_init(struct shortpath* sp)
 {
@@ -398,23 +415,6 @@ static void popgrid(struct shortpath* sp, size_t nblks, struct mt64* mt)
 		/* we can safely add over an existing wall/block */
 		sp->grid[indexofxy(x, y, sp->size)] = 'x';
 	}
-}
-
-static void dmpgrid(const struct shortpath* sp)
-{
-#if 0
-	size_t x;
-	size_t y;
-
-	for (y = 0 ; sp->size > y ; y++) {
-		for (x = 0 ; sp->size > x ; x++) {
-			printf("%c", sp->grid[indexofxy(x, y, sp->size)]);
-		}
-		putchar('\n');
-	}
-#else
-	(void)sp;
-#endif
 }
 
 /* -------------------------------------------------------------------------- */
