@@ -2,11 +2,6 @@
 - fix dockerfile and makefile
 >> update config.mk accordingly (lib locations)
 
-- hard-code rsa key
--- might have to add a lib/rsa api to load the key
->> update src/config.h accordingly
->> update src/main.c accordingly
-
 - the dockerfile should create a file in the workdir that
   the miner checks for presence. if missing, the key is registered.
 
