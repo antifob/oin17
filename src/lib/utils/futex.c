@@ -79,7 +79,7 @@ struct cv {
 
 /* -------------------------------------------------------------------------- */
 
-static int
+static long
 sys_futex(void* a1, int op, int v1, struct timespec* to, void* a2, int v3)
 {
 	return syscall(SYS_futex, a1, op, v1, to, a2, v3);
