@@ -109,7 +109,7 @@ L_WAIT2:
 
 		if (0 != strstr(b, "wallet_id")) {
 			r = 0;
-		} else if (0 != strstr(b, "already_registered")) {
+		} else if (0 != strstr(b, "already registered")) {
 			r = 0;
 		} else if (0 != strstr(b, "invalid signature")) {
 			eprintf("Invalid signature in wallet registration");
