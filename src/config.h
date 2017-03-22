@@ -27,8 +27,8 @@
 /* The team's name (empty is okay) */
 #define TEAM_NAME
 
-/* The main wallet's path */
-#define WALLET_PATH	"./key.oin17"
+/* Uncomment me if the wallet was successfully registered. */
+//#define WALLET_REGISTERED
 
 /* ========================================================================== */
 #endif /* !OIN17_CONFIG_H */

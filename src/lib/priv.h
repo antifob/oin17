@@ -61,6 +61,7 @@ extern void* rsa_keygen(void);
 extern int rsa_savekeys(void*, const char*);
 /* load a keypair (priv,pub) */
 extern void* rsa_loadkeys(const char*);
+extern void* rsa_loadmemkeys(const void*, size_t);
 /* sign a message with the keypair (with private key) */
 extern int rsa_sign(const void*, size_t, void*, void*);
 /* a signature's length */

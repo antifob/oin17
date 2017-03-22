@@ -110,6 +110,29 @@ void* rsa_loadkeys(const char* priv)
 	return k;
 }
 
+/*
+ * https://openssl.org/docs/man1.1.0/crypto/BIO_new_mem_buf.html
+ */
+void* rsa_loadmemkeys(const void* buf, size_t len)
+{
+	BIO* b;
+	RSA* k;
+	RSA* t;
+
+	if (0 != (k = RSA_new())) {
+		if (0 != (b = BIO_new_mem_buf(buf, len))) {
+			t = PEM_read_bio_RSAPrivateKey(b, &k, 0, 0);
+			if (0 == t) {
+				RSA_free(k);
+			}
+			k = t;
+			BIO_free(b);
+		}
+	}
+
+	return k;
+}
+
 /* public key only */
 char* rsa_topem(void* key)
 {

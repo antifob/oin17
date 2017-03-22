@@ -72,6 +72,9 @@ distclean: clean
 ## -------------------------------------------------------------------------- ##
 ## dependencies
 
-${OBJ}: config.h oin17.h
+${OBJ}: config.h oin17.h key.h
+
+key.h:
+	sh ../tools/keygen.sh walletkey > key.h
 
 ## ========================================================================== ##

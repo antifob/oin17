@@ -48,6 +48,7 @@ struct wallet {
 
 extern int  wallet_new(struct wallet*);
 extern int  wallet_load(struct wallet*, const char*);
+extern int  wallet_loadmem(struct wallet*, const void*, size_t);
 extern int  wallet_save(const struct wallet*, const char*);
 extern void wallet_free(struct wallet*);
 extern int  wallet_sign(struct wallet*, const void*, size_t);

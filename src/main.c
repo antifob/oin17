@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include "oin17.h"
+#include "key.h"
 
 /* -------------------------------------------------------------------------- */
 
@@ -20,25 +21,30 @@ static struct wallet wallet;
 
 static int init_wallet(void)
 {
-	if (0 == wallet_load(&wallet, WALLET_PATH)) {
-		iprintf("Loaded wallet %s", wallet.id);
-		return 0;
-	}
-
-	iprintf("Creating wallet");
-	if (0 != wallet_new(&wallet)) {
+	if (0 != wallet_loadmem(&wallet, walletkey, (sizeof(walletkey) - 1))) {
+		eprintf("Failed to load wallet");
 		return -1;
 	}
+
+#ifndef WALLET_REGISTERED
 	if (0 != register_wallet(&wallet)) {
 		wallet_free(&wallet);
 		return -1;
 	}
-	if (0 != wallet_save(&wallet, WALLET_PATH)) {
-		eprintf("Could not save wallet");
-		return -1;
-	}
 
-	iprintf("Wallet saved at '%s'", WALLET_PATH);
+	iprintf("Wallet was registered succesfully: HERE(WALLET_REGISTERED)");
+
+	/*
+	 * Create a flag file, in case we run again
+	 * without having exited the container.
+	 */
+	if (0 != access(".registered", F_OK)) {
+		/* best effort only */
+		fopen(".registered", "w");
+	}
+#endif
+
+	iprintf("Using registered wallet: %s", wallet.id);
 
 	return 0;
 }

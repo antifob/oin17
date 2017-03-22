@@ -111,6 +111,22 @@ int wallet_load(struct wallet* wl, const char* path)
 	return -1;
 }
 
+int wallet_loadmem(struct wallet* wl, const void* buf, size_t len)
+{
+	gprintf("Loading wallet from memory");
+
+	if (0 != (wl->keys = rsa_loadmemkeys(buf, len))) {
+		if (0 == __prepwallet(wl)) {
+			return 0;
+		}
+		/* TODO rsa_destroy(wl->keys); */
+	}
+
+	memset(wl, 0, sizeof(*wl));
+
+	return -1;
+}
+
 /* -------------------------------------------------------------------------- */
 
 int wallet_new(struct wallet* wl)
