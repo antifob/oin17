@@ -140,9 +140,9 @@ static void prwsevent(int id)
 	case LWS_CALLBACK_HTTP_DROP_PROTOCOL: /* 50 */
 		printf("http drop\n");
 		break;
-	//case LWS_CALLBACK_OPENSSL_PERFORM_SERVER_CERT_VERIFICATION: /* 58 */
-		//printf("server cert verification\n");
-		//break;
+	case LWS_CALLBACK_OPENSSL_PERFORM_SERVER_CERT_VERIFICATION: /* 58 */
+		printf("server cert verification\n");
+		break;
 
 	/* ignored */
 	case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER: /* 24 */
@@ -332,9 +332,6 @@ lws_handler(struct lws* ws, enum lws_callback_reasons rs,
 	case LWS_CALLBACK_CLIENT_WRITEABLE: /* 10 */
 		return relayca(uc, ws);
 
-	case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS: /* 21 */
-		break;
-
 	case LWS_CALLBACK_WSI_DESTROY: /* 30 */
 		while (0 != mbufp(&uc->iq, b, sizeof(b))) {
 			/**/;
@@ -350,7 +347,7 @@ lws_handler(struct lws* ws, enum lws_callback_reasons rs,
 		return -1;
 
 	/* IGNORED */
-	case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS:
+	case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS: /* 21 */
 	case LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH: /* 2 */
 	case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER: /* 24 */
 	case LWS_CALLBACK_PROTOCOL_INIT: /* 27 */
