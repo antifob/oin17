@@ -45,9 +45,11 @@ BUILDING
 
         - a modern, C99-compliant, compiler;
         - the make utility;
-        - CMake;
-        - OpenSSL version 1.1.0;
-        - A recent enough zlib or libz.
+        - the bmake utility;
+        - the CMake utility;
+        - the OpenSSL library, version 1.1.0;
+        - the openssl utility;
+        - a recent enough zlib or libz.
 
 
 DEVELOPMENT
