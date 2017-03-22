@@ -1,0 +1,61 @@
+oin17
+
+
+			   oin17 -- A CS coins miner
+
+
+    oin17 is the miner used, by the "Toaster Tech Laboratories" team of the
+    Université du Québec à Montréal, to win the CS Coins challenge of the
+    2017 edition of the CS Games[1]. Since the competition is over, we
+    thought we would share the miner's source code with the public.
+
+
+PREPARING FOR THE EVENT
+
+    Obviously, this program was written for the specific purpose of the
+    competition. As competitors were a bit left in the dark on how the challenge
+    would take place, we had to prepare a lot more than was necessary in order
+    to be in the best possible position right at the beginning.
+
+    We knew we would be able to install libraries and tools, and that the system
+    would be Linux-based. Not knowing which distribution would be available, we
+    decided to bring some of our dependencies to make sure we would not be set
+    back by incompatibilities. These dependencies can be found in 3rd/.
+
+    We doubted miners would coexist in the same space so assumed we would either
+    run in a VM (where we would have full control) or in a container (so it
+    would be lower in resources requirements). For the first case, we prepared a
+    VM image-building script. For the second case, we prepared a Dockerfile.
+    Additionally, we prepared for fast "adapt and reload" cycles by writing
+    deployment automation scripts.
+
+
+DURING THE EVENT
+
+    TODO
+
+LICENSE
+
+    This project cannot be distributed at the moment.
+
+
+BUILDING
+
+    To build oin17, the following tools are needed:
+
+        - a modern, C99-compliant, compiler;
+        - the make utility;
+        - CMake;
+        - OpenSSL version 1.1.0;
+        - A recent enough zlib or libz.
+
+
+DEVELOPMENT
+
+    Setup your own CA server. There is a script in tools/ available to
+    facilitate the process.
+
+
+REFERENCES
+
+    [1] http://2017.csgames.org/

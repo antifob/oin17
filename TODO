@@ -1,0 +1,27 @@
+
+- fix dockerfile and makefile
+>> update config.mk accordingly (lib locations)
+
+- hard-code rsa key
+-- might have to add a lib/rsa api to load the key
+>> update src/config.h accordingly
+>> update src/main.c accordingly
+
+- the dockerfile should create a file in the workdir that
+  the miner checks for presence. if missing, the key is registered.
+
+- fix parallelization
+>> The tpool API is unsuited for parallelization of a common task.
+>> Update.
+
+- Handle connection timeouts.
+-- Keep screen clean
+- Handle server disconnects.
+-- Keep screen clean
+** no more than 30 requests per minute
+- Keep track of transactions so we know whether our solution was accepted?
+
+- uqueue
+-- remove polling
+-- remove pipe() as descriptor, in-app: remove close(uq)
+-- remove unused filters (keep timer, extend)

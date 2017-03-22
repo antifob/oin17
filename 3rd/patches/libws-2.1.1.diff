@@ -1,0 +1,31 @@
+Philippe Grégoire <gregoire.philippe.4@courrier.uqam.ca>
+
+libwebsockets-2.1.1
+
+    Allow seamless build on i386 and amd64 architectures.
+
+--- a/lib/extension-permessage-deflate.c	2017-03-16 20:52:35.259358951 -0400
++++ b/lib/extension-permessage-deflate.c	2017-03-16 20:53:00.671357770 -0400
+@@ -303,9 +303,9 @@
+ 		priv->count_rx_between_fin += eff_buf->token_len;
+ 
+ 		lwsl_ext("  %s: RX leaving with new effbuff len %d, "
+-			 "ret %d, rx.avail_in=%d, TOTAL RX since FIN %ld\n",
++			 "ret %d, rx.avail_in=%d, TOTAL RX since FIN %d\n",
+ 			 __func__, eff_buf->token_len, priv->rx_held_valid,
+-			 priv->rx.avail_in, priv->count_rx_between_fin);
++			 priv->rx.avail_in, (int)priv->count_rx_between_fin);
+ 
+ 		if (was_fin) {
+ 			priv->count_rx_between_fin = 0;
+--- a/lib/handshake.c	2017-03-16 21:09:27.111311902 -0400
++++ b/lib/handshake.c	2017-03-16 21:09:51.515310767 -0400
+@@ -245,7 +245,7 @@
+ 
+ read_ok:
+ 	/* Nothing more to do for now */
+-	lwsl_info("%s: read_ok, used %ld\n", __func__, buf - oldbuf);
++	lwsl_info("%s: read_ok, used %d\n", __func__, (int)(buf - oldbuf));
+ 
+ 	return buf - oldbuf;
+ 

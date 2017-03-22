@@ -1,0 +1,18 @@
+Philippe Grégoire <gregoire.philippe.4@courrier.uqam.ca>
+
+    Fix build with old compilers.
+
+    The solution should really to detect compiler options and behavior
+    with the configure script.
+
+--- b/Makefile.inc.in	2017-03-13 17:40:16.491940825 -0400
++++ a/Makefile.inc.in	2017-03-13 17:40:37.159941265 -0400
+@@ -7,7 +7,7 @@
+ ## ========================================================================== ##
+ 
+ CC=		@CC@
+-CFLAGS+=	-Wall -Wno-unused-function -fstack-protector-strong
++CFLAGS+=	-Wall -Wno-unused-function -Wno-unused-result
+ CFLAGS+=	@CFLAGS@ -I@srcdir@/src
+ LDFLAGS+=	@LDFLAGS@
+ 

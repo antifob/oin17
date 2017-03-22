@@ -1,0 +1,11 @@
+--- old/lib/lws-plat-unix.c	2017-03-21 03:53:29.064000000 +0000
++++ libwebsockets-2.2.0/lib/lws-plat-unix.c	2017-03-21 03:56:59.544000000 +0000
+@@ -669,7 +669,7 @@
+ 		fop_fd->pos = r;
+ 	else
+ 		lwsl_err("error seeking from cur %ld, offset %ld\n",
+-			 fop_fd->pos, offset);
++			 (long)fop_fd->pos, (long)offset);
+ 
+ 	return r;
+ }

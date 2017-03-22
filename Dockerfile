@@ -1,0 +1,52 @@
+## ========================================================================== ##
+##
+## This file is part of oin17.
+##
+## Copyright 2017, Philippe Grégoire
+##
+## The image does not contain the source code. It is, rather,
+## shared with the host. This way, the code can be modified
+## while the container is running and rebuilt when it is
+## started. The entrypoint script takes care of calling make
+## to ensure the executable is up to date and, then, launching
+## the miner.
+##
+## ========================================================================== ##
+
+FROM debian:sid
+LABEL author="Philippe Grégoire"
+
+## -------------------------------------------------------------------------- ##
+## install
+##
+## gcc make		oin17 jsmn uqueue
+## libssl-dev		oin17 libwebsockets
+## libz-dev		libwebsockets
+## cmake		libwebsockets
+## ca-certificates	oin17
+## bmake		uqueue
+##
+
+RUN apt-get update
+RUN apt-get install -y gcc make bmake cmake libssl-dev libz-dev ca-certificates
+
+# patch Debian's broken bmake (bug#821752)
+WORKDIR "/usr/share/mk"
+RUN /bin/sh -c "cp bsd.lib.mk bsd.lib.mk.orig; sed -e 's|-soname lib|-Wl,-soname=lib|' bsd.lib.mk.orig > bsd.lib.mk"
+
+# build local dependencies
+# install local dependencies
+# build the miner
+# install the miner
+
+# the unprivileged user
+RUN useradd -m oin17
+
+## -------------------------------------------------------------------------- ##
+## execution
+
+USER "oin17"
+WORKDIR "/home/oin17"
+CMD ["/bin/sh", "/home/oin17/run-run.sh"]
+
+## ========================================================================== ##
