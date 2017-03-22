@@ -60,7 +60,7 @@ static void sort(const struct chal* chl, struct sortlist* sl)
 		smoothsort64(sl->nums, chl->params.sl.nelems, 1);
 #endif
 	} else {
-		eprintf("Internal error");
+		eprintf("Internal error: unexpected challenge in sortlist");
 		exit(1);
 	}
 }
