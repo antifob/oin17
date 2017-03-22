@@ -14,11 +14,11 @@
 
 /* -------------------------------------------------------------------------- */
 
-static int __cmp(uint64_t a, uint64_t b)
+static inline int __cmp(uint64_t a, uint64_t b)
 {
 	return ((a < b) ? -1 : ((a == b) ? 0 : 1));
 }
-static int cmp(uint64_t a, uint64_t b, size_t rev)
+static inline int cmp(uint64_t a, uint64_t b, size_t rev)
 {
 	return ((0 != rev) ? (0 - __cmp(a, b)) : __cmp(a, b));
 }

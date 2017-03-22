@@ -13,7 +13,7 @@
 /* -------------------------------------------------------------------------- */
 
 /*
- * Convert newlines ('\n' to "\\n"
+ * Convert newlines ('\n' to "\\n")
  *
  * The CA does not like control characters.
  * The original buffer pointer may be modified.
@@ -21,7 +21,8 @@
  *
  * Returns 0 on success.
  *
- * FIXME make an inlined replacement (low-priority)
+ * Since registration occurs before mining
+ * begins, we can disregard dynamic memory usage.
  */
 static int pem_expand(char** pem)
 {

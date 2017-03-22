@@ -68,7 +68,6 @@ extern int rsa_sign(const void*, size_t, void*, void*);
 extern size_t rsa_signlen(void*);
 
 extern char* rsa_topem(void*);
-
 extern uint8_t* rsa_toder(void*, size_t*);
 
 /* -------------------------------------------------------------------------- */
@@ -200,9 +199,6 @@ extern void ws_dispatch(void*);
 
 /* useful shorthands */
 #define REALLOC(p,n,s)	reallocarray((p), (n), (s))
-#define CLOSE(d)	do { if (0 <= (d)) { close(d); } } while (0)
-#define FREE(p)		do { if (0 != (p)) { free(p); } } while (0)
-#define FREE0(p)	do { if (0 != (p)) { free(p); (p) = 0; } } while (0)
 #define NARRAY(a)	(sizeof(a) / sizeof((a)[0]))
 
 /* ========================================================================== */
