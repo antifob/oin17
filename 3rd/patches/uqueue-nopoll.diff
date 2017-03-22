@@ -1,0 +1,68 @@
+--- a/src/uqueue.c	2017-03-21 22:55:27.772758485 -0400
++++ b/src/uqueue.c	2017-03-21 22:56:15.580756803 -0400
+@@ -35,7 +35,6 @@
+ #include <sys/socket.h>
+ 
+ #include <errno.h>
+-#include <poll.h>
+ 
+ #include "control.h"
+ 
+@@ -214,57 +213,12 @@
+ 	return i;
+ }
+ 
+-/* returns 1 if closed, -1 on error, 0 if not closed */
+-static int __qcheck(const struct uqueue* uq)
+-{
+-	int r;
+-	struct pollfd p;
+-
+-	p.fd     = uq->fd;
+-	p.events = POLLIN;
+-
+-	if (1 == (r = poll(&p, 1, 0))) {
+-		return (POLLNVAL == p.revents) ? 1 : 0;
+-	}
+-
+-	return r;
+-}
+-
+-static int qcheck(int idx)
+-{
+-	int r;
+-
+-	do {
+-		if (0 >= (r = __qcheck(queues[idx]))) {
+-			if ((0 == r) || (EINTR != errno)) {
+-				return r;
+-			}
+-		} else {
+-			break;
+-		}
+-	} while (1);
+-
+-
+-	qdestroy(queues[idx]);
+-
+-	LOCK();
+-	queues[idx] = 0;
+-	UNLOCK();
+-
+-	errno = EINVAL;
+-	return -1;
+-}
+-
+ struct uqueue* getqueue(int uq)
+ {
+ 	if (0 > (uq = __getqueue(uq))) {
+ 		return 0;
+ 	}
+ 
+-	if (0 > qcheck(uq))  {
+-		return 0;
+-	}
+-
+ 	return queues[uq];
+ }
+ 
