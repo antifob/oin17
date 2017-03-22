@@ -4,8 +4,6 @@
  * Copyright 2017, Philippe Grégoire
  */
 
-/* TODO Use static array of mbufs (no malloc at run-time) */
-
 /* ========================================================================== */
 
 #include <errno.h>
@@ -45,7 +43,6 @@ struct mbuf* mbuf(const void* buf, size_t len)
 		}
 		if (l == i) {
 			panic("not enough mbufs");
-			return 0;
 		}
 	} while (0 != 1);
 

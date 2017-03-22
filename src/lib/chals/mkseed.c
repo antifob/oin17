@@ -24,9 +24,8 @@ uint64_t mkseed(char* hbuf, uint64_t non)
 
 	p = (uint64_t*)sha;
 
-	hbuf[SHA256_DLEN] = 0;
 	l = u64str(non, &hbuf[SHA256_DLEN]);
-	hbuf[(SHA256_DLEN + l)] = 0;
+	hbuf[(SHA256_DLEN + l)] = 0; /* if someone wants to print it */
 	sha256(hbuf, (SHA256_DLEN + l), sha);
 
 	/* FIXME little-endian only? */

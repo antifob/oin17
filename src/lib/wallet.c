@@ -12,9 +12,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <openssl/rsa.h>
-#include <openssl/x509.h>
-
 #include "priv.h"
 
 /* -------------------------------------------------------------------------- */
@@ -52,9 +49,6 @@ int wallet_save(const struct wallet* wl, const char* path)
 
 /* -------------------------------------------------------------------------- */
 
-/*
- * https://www.openssl.org/docs/man1.1.0/crypto/i2d_RSA_PUBKEY.html
- */
 static int makewid(struct wallet* wl)
 {
 	size_t l;

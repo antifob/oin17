@@ -45,7 +45,7 @@ static inline int __sendcmd(int sk, const char* fmt, ...)
 {
 	int n;
 	va_list vl;
-	char b[4096];
+	char b[MAXMSGLEN];
 
 	va_start(vl, fmt);
 	n = vsnprintf(b, sizeof(b), fmt, vl);

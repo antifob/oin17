@@ -53,8 +53,6 @@ static int __solve(const struct chal* chl, struct solver* sl, csolver_t cs)
 		UQ_SET(&ue, chl->id, UQFILT_SOLVR, 0, QNOTE_TRIGGER, 0, 0);
 		ue.data = (intptr_t)(sl->nonce);
 		uevent(sl->uq, &ue, 1, 0, 0, 0);
-	//	sleep(10);
-	//	exit(0);
 	}
 
 	return 0;
