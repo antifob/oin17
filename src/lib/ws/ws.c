@@ -19,7 +19,11 @@ way, the application can read, write and poll the socket as if the
 WebSockets protocol was not involved.
 #endif
 
-/* TODO TLS, see callback event 58 */
+/*
+ * OpenSSL takes care of properly validating the certificate
+ * chain AND the hostname. You may validate with tools/mk-testcerts.
+ */
+
 /* TODO TLS, ciphers */
 
 /* ========================================================================== */
@@ -329,7 +333,6 @@ lws_handler(struct lws* ws, enum lws_callback_reasons rs,
 		return relayca(uc, ws);
 
 	case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS: /* 21 */
-		wprintf("ssl");
 		break;
 
 	case LWS_CALLBACK_WSI_DESTROY: /* 30 */
@@ -346,18 +349,8 @@ lws_handler(struct lws* ws, enum lws_callback_reasons rs,
 		wprintf("Server initiated disconnexion");
 		return -1;
 
-#if 1
-	case LWS_CALLBACK_OPENSSL_PERFORM_SERVER_CERT_VERIFICATION: /* 58 */
-		wprintf("tls callback");
-		/* return 0=accept, 1=reject */
-		/* user=X509_STORE_CTX, in=SSL */
-		//return (0 == checkcert(user, in)) ? 0 : 1;
-		break;
-#endif
-
-
 	/* IGNORED */
-	//case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS:
+	case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS:
 	case LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH: /* 2 */
 	case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER: /* 24 */
 	case LWS_CALLBACK_PROTOCOL_INIT: /* 27 */
