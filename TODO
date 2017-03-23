@@ -2,9 +2,6 @@
 - fix dockerfile and makefile
 >> update config.mk accordingly (lib locations)
 
-- the dockerfile should create a file in the workdir that
-  the miner checks for presence. if missing, the key is registered.
-
 - fix parallelization
 >> The tpool API is unsuited for parallelization of a common task.
 >> Update.
@@ -17,6 +14,7 @@
 - Keep track of transactions so we know whether our solution was accepted?
 
 - uqueue
--- remove polling
--- remove pipe() as descriptor, in-app: remove close(uq)
--- remove unused filters (keep timer, extend)
+-- remove polling (patch is there, to test)
+-- remove socket() as descriptor, in-app: remove close(uq)
+-- remove unused filters (keep ?timer?, extend)
+-- use futex-based mutexes
