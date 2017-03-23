@@ -111,7 +111,7 @@ static int handle_newchal(char* buf, size_t len, struct chl* chl)
 
 	dropchal(chl);
 
-	memset(&chl->chal, &chal, sizeof(chl->chal));
+	memcpy(&chl->chal, &chal, sizeof(chl->chal));
 
 	return startchal(chl);
 }
