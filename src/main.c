@@ -27,20 +27,22 @@ static int init_wallet(void)
 	}
 
 #ifndef WALLET_REGISTERED
-	if (0 != register_wallet(&wallet)) {
-		wallet_free(&wallet);
-		return -1;
-	}
-
-	iprintf("Wallet was registered succesfully: HERE(WALLET_REGISTERED)");
-
-	/*
-	 * Create a flag file, in case we run again
-	 * without having exited the container.
-	 */
 	if (0 != access(".registered", F_OK)) {
-		/* best effort only */
-		fopen(".registered", "w");
+		if (0 != register_wallet(&wallet)) {
+			wallet_free(&wallet);
+			return -1;
+		}
+
+		iprintf("Wallet was registered succesfully");
+
+		/*
+		 * Create a flag file, in case we run again
+		 * without having exited the container.
+		 */
+		FILE* f;
+		if (0 != (f = fopen(".registered", "w"))) {
+			fclose(f);
+		}
 	}
 #endif
 
