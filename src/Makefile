@@ -41,6 +41,7 @@ SRC=	main.c \
         lib/crypto/sha256.c \
         \
         lib/utils/bin2hex.c \
+	lib/utils/futex.c \
         lib/utils/hex2bin.c \
         lib/utils/printf.c \
         lib/utils/smoothsort64.c \
