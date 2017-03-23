@@ -67,7 +67,7 @@ struct uconn {
 static struct lws_context*		ctx;
 static struct lws_client_connect_info	ccin;
 
-static pthread_mutex_t	lock = PTHREAD_MUTEX_INITIALIZER;
+static mutex lock;
 static struct uconn	uconns[MAXUCONNS];
 
 /* -------------------------------------------------------------------------- */
@@ -208,10 +208,10 @@ static int __recvfrag(struct uconn* uc)
 	
 
 	if (0 != (mb = mbuf(uc->fb, uc->fo))) {
-		pthread_mutex_lock(&lock);
+		mutex_lock(&lock);
 		mbufq(&uc->iq, mb);
 		uc->fo = 0;
-		pthread_mutex_unlock(&lock);
+		mutex_unlock(&lock);
 	}
 
 	return (0 == mb) ? -1 : 0;
@@ -417,11 +417,11 @@ void ws_close(int id)
 		return;
 	}
 
-	pthread_mutex_lock(&lock);
+	mutex_lock(&lock);
 	if (id == uconns[id].id) {
 		deluconn(&uconns[id]);
 	}
-	pthread_mutex_unlock(&lock);
+	mutex_unlock(&lock);
 }
 
 int ws_send(int id, const void* buf, size_t len)
@@ -441,7 +441,7 @@ int ws_send(int id, const void* buf, size_t len)
 	}
 
 	r = -1;
-	pthread_mutex_lock(&lock);
+	mutex_lock(&lock);
 	if (id == uconns[id].id) {
 		gprintf("Queueing outgoing message");
 		mbufq(&uconns[id].oq, m);
@@ -460,7 +460,7 @@ int ws_send(int id, const void* buf, size_t len)
 		uconns[id].st |= S_SENDREQ;
 		lws_callback_on_writable(uconns[id].ws);
 	}
-	pthread_mutex_unlock(&lock);
+	mutex_unlock(&lock);
 
 	return r;
 }
@@ -475,11 +475,11 @@ int ws_recv(int id, void* buf, size_t len)
 	}
 
 	r = -1;
-	pthread_mutex_lock(&lock);
+	mutex_lock(&lock);
 	if (id == uconns[id].id) {
 		r = mbufp(&uconns[id].iq, buf, len);
 	}
-	pthread_mutex_unlock(&lock);
+	mutex_unlock(&lock);
 
 	return r;
 }

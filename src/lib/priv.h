@@ -16,6 +16,30 @@
 #include "libcscoins.h"
 
 /* -------------------------------------------------------------------------- */
+/* Mutexes and condition variables */
+
+typedef union mutex mutex;
+union mutex {
+	uint32_t	u;
+	struct {
+		uint8_t	locked;
+		uint8_t	contended;
+	} b;
+};
+
+typedef struct cv cv;
+struct cv {
+	mutex*	m;
+	int	seq;
+	int	__pad;
+};
+
+extern int cond_wait(cv*, mutex*);
+extern int cond_signal(cv*);
+extern int mutex_lock(mutex*);
+extern int mutex_unlock(mutex*);
+
+/* -------------------------------------------------------------------------- */
 /* Thread pool */
 
 /*! init_tpool() */
