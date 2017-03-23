@@ -62,23 +62,6 @@ static inline uint8_t xchg8(void* ptr, uint8_t x)
 
 /* -------------------------------------------------------------------------- */
 
-union mutex
-{
-	uint32_t	u;
-	struct {
-		uint8_t	locked;
-		uint8_t	contended;
-	} b;
-};
-
-struct cv {
-	mutex*	m;
-	int	seq;
-	int	__pad;
-};
-
-/* -------------------------------------------------------------------------- */
-
 static long
 sys_futex(void* a1, int op, int v1, struct timespec* to, void* a2, int v3)
 {
