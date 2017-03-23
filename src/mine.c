@@ -228,6 +228,10 @@ L_WAIT:
 			}
 			break;
 		case UQFILT_SOLVR:
+			if (ue.ident != chl.chal.id) {
+				/* ignore event backlog */
+				break;
+			}
 			if (0 != chl.solved) {
 				wprintf("Ignoring late solution");
 			} else {
