@@ -513,6 +513,8 @@ static int __init_ctx(void)
 	i.uid  = -1;
 
 	i.ssl_ca_filepath = "/etc/ssl/certs/ca-certificates.crt";
+	/* FIXME port 443 shows: ECDHE-RSA-AES128-GCM-SHA256 */
+	i.ssl_cipher_list = "HIGH";
 	i.protocols  = lws_prots;
 	i.options   |= LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
 	//i.extensions = lws_exts;
