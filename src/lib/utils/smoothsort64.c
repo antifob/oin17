@@ -254,6 +254,14 @@ void smoothsort64(uint64_t* a, size_t n, size_t rev)
 #ifdef SMOOTHSORT64_MAIN
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+static uint64_t now(void)
+{
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return ((uint64_t)ts.tv_sec * 1000000000) + ts.tv_nsec;
+}
 
 int main(void)
 {
@@ -262,13 +270,23 @@ int main(void)
 	uint64_t a[1000];
 
 	size_t i;
+	uint64_t t1;
+	uint64_t t2;
 
 	for (i = 0 ; N(a) > i ; i++) a[i] = rand();
+
+	t1 = now();
 	smoothsort64(a, N(a), 0);
-	for (i = 0 ; N(a) > i ; i++) printf("%llu\n", a[i]);
+	t2 = now();
+	//for (i = 0 ; N(a) > i ; i++) printf("%llu\n", a[i]);
+	printf("time: %llu\n", t2 - t1);
+
 	for (i = 0 ; N(a) > i ; i++) a[i] = rand();
+	t1 = now();
 	smoothsort64(a, N(a), 1);
-	for (i = 0 ; N(a) > i ; i++) printf("%llu\n", a[i]);
+	t2 = now();
+	//for (i = 0 ; N(a) > i ; i++) printf("%llu\n", a[i]);
+	printf("time: %llu\n", t2 - t1);
 
 	return 0;
 }
