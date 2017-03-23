@@ -102,12 +102,16 @@ static int startchal(struct chl* chl)
 
 static int handle_newchal(char* buf, size_t len, struct chl* chl)
 {
-	if (0 != chal_parse(buf, len, &chl->chal)) {
+	struct chal chal;
+
+	if (0 != chal_parse(buf, len, &chal)) {
 		return -1;
 	}
-	gprintf("New challenge received: %" PRIu64, chl->chal.id);
+	gprintf("New challenge received: %" PRIu64, chal.id);
 
 	dropchal(chl);
+
+	memset(&chl->chal, &chal, sizeof(chl->chal));
 
 	return startchal(chl);
 }
