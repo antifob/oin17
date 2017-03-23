@@ -3,8 +3,8 @@
  *
  * Copyright 2017, Philippe Grégoire
  *
- * Adapted version of (2017-03-15):
- * https://en.wikibooks.org/wiki/Algorithm_Implementation/Sorting/Smoothsort
+ * Adapted version of (2017-03-23):
+ * https://en.wikibooks.org/wiki/Algorithm_Implementation/Sorting/Heapsort
  */
 
 /* ========================================================================== */
@@ -76,30 +76,45 @@ static uint64_t now(void)
 	return ((uint64_t)ts.tv_sec * 1000000000) + ts.tv_nsec;
 }
 
+static void __sort(uint64_t* buf, size_t cnt, size_t rev)
+{
+	size_t i;
+	uint64_t a;
+	uint64_t b;
+
+	a = now();
+	heapsort64(buf, cnt, rev);
+	b = now();
+
+	for (i = 0 ; cnt > i ; i++) {
+		//printf("%llu\n", buf[i]);
+	}
+
+	printf("time: %llu\n", (b - a));
+}
+
+static void sort(uint64_t* buf, size_t cnt, size_t rev)
+{
+	size_t i;
+
+	for (i = 0 ; cnt > i ; i++) {
+		buf[i] = rand();
+	}
+
+	__sort(buf, cnt, rev);
+	__sort(buf, cnt, rev);
+	__sort(buf, cnt, !rev);
+	__sort(buf, cnt, !rev);
+}
+
 int main(void)
 {
-#define N(a)	(sizeof(a) / sizeof(a[0]))
+#define N(a)    (sizeof(a) / sizeof(a[0]))
 
 	uint64_t a[1000];
 
-	size_t i;
-	uint64_t t1;
-	uint64_t t2;
-
-	for (i = 0 ; N(a) > i ; i++) a[i] = rand();
-
-	t1 = now();
-	heapsort64(a, N(a), 0);
-	t2 = now();
-	//for (i = 0 ; N(a) > i ; i++) printf("%llu\n", a[i]);
-	printf("time: %llu\n", t2 - t1);
-
-	for (i = 0 ; N(a) > i ; i++) a[i] = rand();
-	t1 = now();
-	heapsort64(a, N(a), 1);
-	t2 = now();
-	//for (i = 0 ; N(a) > i ; i++) printf("%llu\n", a[i]);
-	printf("time: %llu\n", t2 - t1);
+	sort(a, N(a), 0);
+	sort(a, N(a), 1);
 
 	return 0;
 }
