@@ -120,7 +120,11 @@ static int handle_newchal(char* buf, size_t len, struct chl* chl)
 
 static int sendnonce(int sk, uint64_t non, struct wallet* wl)
 {
-	gprintf("Sending solution %" PRIu64, non);
+#ifdef OIN17_DEBUG
+	iprintf("Sending solution %" PRIu64, non);
+#else
+	iprintf("Sending solution");
+#endif
 
 	if (0 != ca_submit(sk, wl, non)) {
 		eprintf("Failed to send submission");
