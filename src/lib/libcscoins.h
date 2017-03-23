@@ -104,6 +104,7 @@ struct solver {
 	int		uq;		/* uqueue to report on */
 
 	/* do not touch the below fields */
+	void*		prng;
 	void*		sl;
 	void*		sp;
 	uint64_t	nonce;

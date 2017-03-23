@@ -16,6 +16,7 @@ expand the buffers at run-time if it requires to.
 
 /* ========================================================================== */
 
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -98,6 +99,7 @@ int solver_stop(int tp)
 int solver_init(struct solver* sl)
 {
 	struct chal c;
+	struct timespec ts;
 
 	memset(sl, 0, sizeof(*sl));
 
@@ -105,12 +107,19 @@ int solver_init(struct solver* sl)
 	c.params.sl.nelems	= SL_EXPNUMS;
 	c.params.sp.size	= SP_EXPSIZE;
 
-	if (0 != solver_resize(sl, &c)) {
-		eprintf("Failed to initialize solver");
-		return -1;
+	if (0 != (sl->prng = calloc(1, sizeof(struct mt64)))) {
+		if (0 == clock_gettime(CLOCK_MONOTONIC, &ts)) {
+			mt64_seed(sl->prng, ts.tv_nsec);
+			if (0 == solver_resize(sl, &c)) {
+				return 0;
+			}
+		}
+		free(sl->prng);
+		sl->prng = 0;
 	}
 
-	return 0;
+	eprintf("Failed to initialize solver");
+	return -1;
 }
 
 void solver_free(struct solver* sl)

@@ -70,7 +70,7 @@ static void dropchal(void)
 	size_t i;
 	struct uevent ue;
 
-	/* stop solvers */
+	gprintf("Stopping solvers");
 	for (i = 0 ; mchl.nslv > i ; i++) {
 		if (0 > mchl.slvs[i].pool) {
 			continue;
@@ -103,6 +103,7 @@ static int startchal(void)
 	iprintf("#%" PRIu64 ",%hhu,%u",
 	        mchl.chal.id, mchl.chal.type, mchl.chal.left);
 
+	gprintf("Starting solvers");
 	for (i = 0 ; MAXSLV > i ; i++) {
 		mchl.slvs[i].solvr.chl = &mchl.chal;
 		mchl.slvs[i].solvr.uq = uq;
@@ -131,10 +132,11 @@ static int handle_newchal(char* buf, size_t len)
 		return 0;
 	}
 
-	memcpy(&mchl.chal, &chal, sizeof(mchl.chal));
-	gprintf("New challenge received: %" PRIu64, mchl.chal.id);
+	gprintf("New challenge received: %" PRIu64, chal.id);
 
 	dropchal();
+
+	memcpy(&mchl.chal, &chal, sizeof(mchl.chal));
 
 	return startchal();
 }

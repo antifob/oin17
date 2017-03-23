@@ -60,7 +60,7 @@ static void sort(const struct chal* chl, struct sortlist* sl)
 		smoothsort64(sl->nums, chl->params.sl.nelems, 1);
 #endif
 	} else {
-		eprintf("Internal error");
+		eprintf("Internal error: unexpected challenge in sortlist (%llu)", chl->type);
 		exit(1);
 	}
 }
@@ -70,7 +70,6 @@ static void sort(const struct chal* chl, struct sortlist* sl)
 int sortlist(const struct chal* chl, struct solver* slv)
 {
 	size_t l;
-	struct mt64 mt64;
 	struct sortlist* sl;
 	uint8_t d[SHA256_LEN];
 	char lh[SHA256_DLEN + U64STRLEN + 1];
@@ -84,9 +83,9 @@ int sortlist(const struct chal* chl, struct solver* slv)
 
 
 	/* generate the random numbers */
-	slv->nonce = getnonce();
-	mt64_seed(&mt64, mkseed(lh, slv->nonce));
-	mt64_randn(&mt64, sl->nums, chl->params.sl.nelems);
+	slv->nonce = getnonce(slv->prng);
+	mt64_seed(slv->prng, mkseed(lh, slv->nonce));
+	mt64_randn(slv->prng, sl->nums, chl->params.sl.nelems);
 
 	sort(chl, sl);
 

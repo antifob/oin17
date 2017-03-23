@@ -20,7 +20,7 @@
 #define __NONCEMIN	3000000
 #define __NONCEMAX	10000000
 
-uint64_t getnonce(void)
+uint64_t getnonce(struct mt64* mt)
 {
 	/*
 	 * In theory, nonce can be [0, NONCEMAX];
@@ -37,9 +37,10 @@ uint64_t getnonce(void)
 	uint64_t n;
 
 	do {
-		n = (mt64_rand(0) % NONCEMAX);
+		n = (mt64_rand(mt) % NONCEMAX);
 	} while ((n < __NONCEMIN) || (n > __NONCEMAX));
 
+//iprintf("seed=%llu", n);
 	return n;
 }
 

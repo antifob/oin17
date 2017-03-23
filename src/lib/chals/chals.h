@@ -24,7 +24,7 @@
 
 /* -------------------------------------------------------------------------- */
 
-extern uint64_t getnonce(void);
+extern uint64_t getnonce(struct mt64*);
 extern uint64_t mkseed(char*, uint64_t);
 
 extern size_t mku64str(const uint64_t*, size_t, char*);

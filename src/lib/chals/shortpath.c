@@ -422,7 +422,6 @@ static void popgrid(struct shortpath* sp, size_t nblks, struct mt64* mt)
 int shortpath(const struct chal* chl, struct solver* slv)
 {
 	size_t l;
-	struct mt64 mt64;
 	struct shortpath* sp;
 	uint8_t d[SHA256_LEN];
 	char lh[SHA256_DLEN + U64STRLEN + 1];
@@ -436,16 +435,16 @@ int shortpath(const struct chal* chl, struct solver* slv)
 
 #if 1
 	/* generate the seed */
-	slv->nonce = getnonce();
+	slv->nonce = getnonce(slv->prng);
 #else
 	/* replicate server */
 	slv->nonce = 837036405;
 	memcpy(lh, "cf9574d5d9a95b568de5bd288c743a3afecc00575c39490d4a8a249c7ae81948", SHA256_DLEN);
 #endif
 
-	mt64_seed(&mt64, mkseed(lh, slv->nonce));
+	mt64_seed(slv->prng, mkseed(lh, slv->nonce));
 
-	popgrid(sp, chl->params.sp.nblks, &mt64);
+	popgrid(sp, chl->params.sp.nblks, slv->prng);
 
 	if (0 == (l = search(slv))) {
 		return -1;
