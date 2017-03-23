@@ -28,7 +28,8 @@
 /* The algorithm used for the (r)sortlist challenges. */
 /*#define SL_QUICKSORT*/
 /*#define SL_SMOOTHSORT*/
-#define SL_HEAPSORT
+/*#define SL_HEAPSORT*/
+#define SL_MERGESORT
 
 /* The expected grid size in the shortpath challenge. */
 #define SP_EXPSIZE	25
