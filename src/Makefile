@@ -42,6 +42,7 @@ SRC=	main.c \
         \
         lib/utils/bin2hex.c \
 	lib/utils/futex.c \
+	lib/utils/heapsort64.c \
         lib/utils/hex2bin.c \
         lib/utils/printf.c \
         lib/utils/smoothsort64.c \

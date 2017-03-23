@@ -150,6 +150,7 @@ extern size_t bin2hex(const void*, size_t, char*);
 extern size_t u64str(uint64_t, char*);
 
 extern void smoothsort64(uint64_t*, size_t, size_t);
+extern void heapsort64(uint64_t*, size_t, size_t);
 
 extern void strrev(char*);
 extern void strnrev(char*, size_t);

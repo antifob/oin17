@@ -14,8 +14,8 @@
 
 #include "chals.h"
 
-#if !defined(SL_QUICKSORT) && !defined(SL_SMOOTHSORT)
-# define SL_SMOOTHSORT
+#if !defined(SL_QUICKSORT) && !defined(SL_SMOOTHSORT) && !defined(SL_HEAPSORT)
+# define SL_HEAPSORT
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -50,12 +50,16 @@ static void sort(const struct chal* chl, struct sortlist* sl)
 	if (CHAL_SORT == chl->type) {
 #ifdef SL_QUICKSORT
 		qsort(sl->nums, chl->params.sl.nelems, sizeof(uint64_t), __sort);
+#elif defined(SL_HEAPSORT)
+		heapsort64(sl->nums, chl->params.sl.nelems, 0);
 #else
 		smoothsort64(sl->nums, chl->params.sl.nelems, 0);
 #endif
 	} else if (CHAL_RSORT == chl->type) {
 #ifdef SL_QUICKSORT
 		qsort(sl->nums, chl->params.sl.nelems, sizeof(uint64_t), __rsort);
+#elif defined(SL_HEAPSORT)
+		heapsort64(sl->nums, chl->params.sl.nelems, 1);
 #else
 		smoothsort64(sl->nums, chl->params.sl.nelems, 1);
 #endif
