@@ -29,18 +29,16 @@ LABEL author="Philippe Grégoire"
 
 RUN apt-get update
 RUN apt-get install -y gcc make bmake cmake libssl-dev libz-dev ca-certificates
+RUN useradd -m oin17
 
 # patch Debian's broken bmake (bug#821752)
 WORKDIR "/usr/share/mk"
 RUN /bin/sh -c "cp bsd.lib.mk bsd.lib.mk.orig; sed -e 's|-soname lib|-Wl,-soname=lib|' bsd.lib.mk.orig > bsd.lib.mk"
 
-# build local dependencies
 # install local dependencies
+
 # build the miner
 # install the miner
-
-# the unprivileged user
-RUN useradd -m oin17
 
 ## -------------------------------------------------------------------------- ##
 ## execution
