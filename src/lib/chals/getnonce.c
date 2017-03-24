@@ -19,7 +19,7 @@ uint64_t getnonce(uint64_t min, uint64_t max)
 	uint64_t n;
 	static uint64_t sn;
        
-	n = __sync_add_and_fetch(&sn, 1);
+	n = __sync_add_and_fetch(&sn, CHAL_NONCEINC);
 	n = (n % (max - min)) + min;
 
 	//iprintf("nonce=%llu", n);

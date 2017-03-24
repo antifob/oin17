@@ -21,6 +21,7 @@
 /* The biggest nonce we can produce + 1 */
 /* see BaseChallengeGenerator.py */
 #define CHAL_MAXNONCE	(99999999 + 1)
+#define CHAL_NONCEINC	3917
 
 /* The expected number of numbers in the sortlist and rsortlist challenges. */
 #define SL_EXPNUMS	1000
