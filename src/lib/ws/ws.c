@@ -36,7 +36,6 @@ WebSockets protocol was not involved.
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -67,7 +66,7 @@ struct uconn {
 static struct lws_context*		ctx;
 static struct lws_client_connect_info	ccin;
 
-static pthread_mutex_t	lock = PTHREAD_MUTEX_INITIALIZER;
+static mutex lock;
 static struct uconn	uconns[MAXUCONNS];
 
 /* -------------------------------------------------------------------------- */
@@ -208,10 +207,10 @@ static int __recvfrag(struct uconn* uc)
 	
 
 	if (0 != (mb = mbuf(uc->fb, uc->fo))) {
-		pthread_mutex_lock(&lock);
+		mutex_lock(&lock);
 		mbufq(&uc->iq, mb);
 		uc->fo = 0;
-		pthread_mutex_unlock(&lock);
+		mutex_unlock(&lock);
 	}
 
 	return (0 == mb) ? -1 : 0;
@@ -417,11 +416,11 @@ void ws_close(int id)
 		return;
 	}
 
-	pthread_mutex_lock(&lock);
+	mutex_lock(&lock);
 	if (id == uconns[id].id) {
 		deluconn(&uconns[id]);
 	}
-	pthread_mutex_unlock(&lock);
+	mutex_unlock(&lock);
 }
 
 int ws_send(int id, const void* buf, size_t len)
@@ -441,7 +440,7 @@ int ws_send(int id, const void* buf, size_t len)
 	}
 
 	r = -1;
-	pthread_mutex_lock(&lock);
+	mutex_lock(&lock);
 	if (id == uconns[id].id) {
 		gprintf("Queueing outgoing message");
 		mbufq(&uconns[id].oq, m);
@@ -460,7 +459,7 @@ int ws_send(int id, const void* buf, size_t len)
 		uconns[id].st |= S_SENDREQ;
 		lws_callback_on_writable(uconns[id].ws);
 	}
-	pthread_mutex_unlock(&lock);
+	mutex_unlock(&lock);
 
 	return r;
 }
@@ -475,11 +474,11 @@ int ws_recv(int id, void* buf, size_t len)
 	}
 
 	r = -1;
-	pthread_mutex_lock(&lock);
+	mutex_lock(&lock);
 	if (id == uconns[id].id) {
 		r = mbufp(&uconns[id].iq, buf, len);
 	}
-	pthread_mutex_unlock(&lock);
+	mutex_unlock(&lock);
 
 	return r;
 }
@@ -514,6 +513,8 @@ static int __init_ctx(void)
 	i.uid  = -1;
 
 	i.ssl_ca_filepath = "/etc/ssl/certs/ca-certificates.crt";
+	/* FIXME port 443 shows: ECDHE-RSA-AES128-GCM-SHA256 */
+	i.ssl_cipher_list = "HIGH";
 	i.protocols  = lws_prots;
 	i.options   |= LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
 	//i.extensions = lws_exts;

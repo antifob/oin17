@@ -13,34 +13,16 @@
 #include "chals.h"
 
 /* -------------------------------------------------------------------------- */
-/* TODO we can refine even more */
 
-/* [10^8, 10^9] or between 7 and 8 digits */
-//#define __NONCEMIN	1000000
-#define __NONCEMIN	3000000
-#define __NONCEMAX	10000000
-
-uint64_t getnonce(struct mt64* mt)
+uint64_t getnonce(uint64_t min, uint64_t max)
 {
-	/*
-	 * In theory, nonce can be [0, NONCEMAX];
-	 * where NONCEMAX is expected to be the
-	 * nonce limit used by the server.
-	 *
-	 * In practice, they are usually in
-	 * [__NONCEMIN, NONCEMAX[.
-	 *
-	 * We can eliminate useless work by ensuring
-	 * the nonce is between these values.
-	 */
-
 	uint64_t n;
+	static uint64_t sn;
+       
+	n = __sync_add_and_fetch(&sn, 1);
+	n = (n % (max - min)) + min;
 
-	do {
-		n = (mt64_rand(mt) % NONCEMAX);
-	} while ((n < __NONCEMIN) || (n > __NONCEMAX));
-
-//iprintf("seed=%llu", n);
+	//iprintf("nonce=%llu", n);
 	return n;
 }
 

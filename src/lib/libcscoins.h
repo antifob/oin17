@@ -102,6 +102,8 @@ extern int chal_parse(const void*, size_t, struct chal*);
 struct solver {
 	struct chal*	chl;		/* the challenge to solve */
 	int		uq;		/* uqueue to report on */
+	uint64_t	nmin;
+	uint64_t	nmax;
 
 	/* do not touch the below fields */
 	void*		prng;

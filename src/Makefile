@@ -41,7 +41,10 @@ SRC=	main.c \
         lib/crypto/sha256.c \
         \
         lib/utils/bin2hex.c \
+	lib/utils/futex.c \
+	lib/utils/heapsort64.c \
         lib/utils/hex2bin.c \
+	lib/utils/mergesort64.c \
         lib/utils/printf.c \
         lib/utils/smoothsort64.c \
 	lib/utils/strrev.c \
@@ -72,7 +75,7 @@ distclean: clean
 ## -------------------------------------------------------------------------- ##
 ## dependencies
 
-${OBJ}: config.h oin17.h key.h
+${OBJ}: config.h oin17.h key.h lib/config.h
 
 key.h:
 	sh ../tools/keygen.sh walletkey > key.h

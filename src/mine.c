@@ -46,7 +46,7 @@ CONNECTION DROPS
 
 /* -------------------------------------------------------------------------- */
 
-#define MAXSLV		4
+#define MAXSLV		TP_RSVD_SOLVR
 
 struct slv {
 	struct solver	solvr;
@@ -109,11 +109,13 @@ static int startchal(void)
 		mchl.slvs[i].solvr.uq = uq;
 		mchl.solved = 0;
 		mchl.slvs[i].pool = solver_start(&mchl.slvs[i].solvr, 1);
+		gprintf("Solver %zu with [%llu,%llu]", i, mchl.slvs[i].solvr.nmin, mchl.slvs[i].solvr.nmax);
 		if (0 > mchl.slvs[i].pool) {
 			break;
 		}
 	}
 
+	gprintf("Started %zu solvers", i);
 	mchl.nslv = i;
 
 	return (0 == i) ? -1 : 0;
@@ -145,7 +147,11 @@ static int handle_newchal(char* buf, size_t len)
 
 static int sendnonce(int sk, uint64_t non, struct wallet* wl)
 {
-	gprintf("Sending solution %" PRIu64, non);
+#ifdef OIN17_DEBUG
+	iprintf("Sending solution %" PRIu64, non);
+#else
+	iprintf("Sending solution %" PRIu64, non);
+#endif
 
 	if (0 != ca_submit(sk, wl, non)) {
 		eprintf("Failed to send submission");
@@ -251,6 +257,10 @@ L_WAIT:
 			}
 			break;
 		case UQFILT_SOLVR:
+			if (ue.ident != mchl.chal.id) {
+				/* ignore event backlog */
+				break;
+			}
 			if (0 != mchl.solved) {
 				wprintf("Ignoring late solution");
 			} else {
@@ -283,16 +293,24 @@ L_QUIT:
 int init_mining(void)
 {
 	size_t i;
+	uint64_t m;
+	uint64_t r;
 
 	if (0 > (uq = uqueue())) {
 		return -1;
 	}
 
-	for (i = 0 ; MAXSLV > i ; i++) {
+	r = ((NONCEMAX - NONCEMIN) / MAXSLV);
+
+	for (i = 0, m = NONCEMIN ; MAXSLV > i ; i++, m += r) {
 		if (0 != solver_init(&mchl.slvs[i].solvr)) {
 			gprintf("Failed to initialize solver");
 			return -1;
 		}
+
+		mchl.slvs[i].solvr.nmin = m;
+		mchl.slvs[i].solvr.nmax = (m + r);
+		iprintf("solver %zu has [%llu,%llu]", i, m, m+r);
 	}
 
 	return 0;

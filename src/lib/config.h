@@ -27,7 +27,9 @@
 
 /* The algorithm used for the (r)sortlist challenges. */
 /*#define SL_QUICKSORT*/
-#define SL_SMOOTHSORT
+/*#define SL_SMOOTHSORT*/
+/*#define SL_HEAPSORT*/
+#define SL_MERGESORT
 
 /* The expected grid size in the shortpath challenge. */
 #define SP_EXPSIZE	25
@@ -44,7 +46,7 @@
  * - solving challenges;
  * - other work (currently: libws).
  */
-#define TP_RSVD_SOLVR	1
+#define TP_RSVD_SOLVR	4
 #define TP_RSVD_OTHER	1
 #define TP_MINTHREADS	(TP_RSVD_SOLVR + TP_RSVD_OTHER)
 

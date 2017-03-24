@@ -14,8 +14,8 @@
 
 #include "chals.h"
 
-#if !defined(SL_QUICKSORT) && !defined(SL_SMOOTHSORT)
-# define SL_SMOOTHSORT
+#if (!defined(SL_QUICKSORT) && !defined(SL_SMOOTHSORT) && !defined(SL_HEAPSORT) && !defined(SL_MERGESORT))
+# define SL_MERGESORT
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -24,6 +24,9 @@ struct sortlist {
 	size_t		max;
 	uint64_t*	nums;
 	char*		str;
+#if defined(SL_MERGESORT)
+	uint64_t*	mtmp;
+#endif
 };
 
 /* -------------------------------------------------------------------------- */
@@ -50,12 +53,20 @@ static void sort(const struct chal* chl, struct sortlist* sl)
 	if (CHAL_SORT == chl->type) {
 #ifdef SL_QUICKSORT
 		qsort(sl->nums, chl->params.sl.nelems, sizeof(uint64_t), __sort);
+#elif defined(SL_HEAPSORT)
+		heapsort64(sl->nums, chl->params.sl.nelems, 0);
+#elif defined(SL_MERGESORT)
+		mergesort64(sl->nums, sl->mtmp, chl->params.sl.nelems, 0);
 #else
 		smoothsort64(sl->nums, chl->params.sl.nelems, 0);
 #endif
 	} else if (CHAL_RSORT == chl->type) {
 #ifdef SL_QUICKSORT
 		qsort(sl->nums, chl->params.sl.nelems, sizeof(uint64_t), __rsort);
+#elif defined(SL_HEAPSORT)
+		heapsort64(sl->nums, chl->params.sl.nelems, 1);
+#elif defined(SL_MERGESORT)
+		mergesort64(sl->nums, sl->mtmp, chl->params.sl.nelems, 1);
 #else
 		smoothsort64(sl->nums, chl->params.sl.nelems, 1);
 #endif
@@ -83,7 +94,7 @@ int sortlist(const struct chal* chl, struct solver* slv)
 
 
 	/* generate the random numbers */
-	slv->nonce = getnonce(slv->prng);
+	slv->nonce = getnonce(slv->nmin, slv->nmax);
 	mt64_seed(slv->prng, mkseed(lh, slv->nonce));
 	mt64_randn(slv->prng, sl->nums, chl->params.sl.nelems);
 
@@ -139,6 +150,15 @@ int sortlist_resize(struct solver* slv, const struct chal* chl)
 	}
 	sl->str = tmp;
 
+#if defined(SL_MERGESORT)
+	tmp = REALLOC(sl->mtmp, chl->params.sl.nelems, sizeof(uint64_t));
+	if (0 == tmp) {
+		eeprintf("Failed to resize sortlist mergesort tmp buf");
+		return -1;
+	}
+	sl->mtmp = tmp;
+#endif
+
 	sl->max = chl->params.sl.nelems;
 	return 0;
 }
@@ -155,6 +175,11 @@ void sortlist_free(struct solver* slv)
 		if (0 != sl->str) {
 			free(sl->str);
 		}
+#if defined(SL_MERGESORT)
+		if (0 != sl->mtmp) {
+			free(sl->mtmp);
+		}
+#endif
 		free(sl);
 		slv->sl = 0;
 	}

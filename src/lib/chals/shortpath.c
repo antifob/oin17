@@ -435,7 +435,7 @@ int shortpath(const struct chal* chl, struct solver* slv)
 
 #if 1
 	/* generate the seed */
-	slv->nonce = getnonce(slv->prng);
+	slv->nonce = getnonce(slv->nmin, slv->nmax);
 #else
 	/* replicate server */
 	slv->nonce = 837036405;

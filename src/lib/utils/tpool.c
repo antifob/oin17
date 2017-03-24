@@ -48,8 +48,8 @@ struct thread {
 	pthread_t	pth;
 	struct pool*	pool;
 
-	pthread_mutex_t	lock;
-	pthread_cond_t	cond;
+	mutex		lock;
+	cv		cond;
 
 	struct thread*	next;
 };
@@ -76,18 +76,19 @@ void* thread_main(void* _thread)
 	th = (struct thread*)_thread;
 
 	while (1) {
-		pthread_mutex_lock(&th->lock);
+		mutex_lock(&th->lock);
 		while (0 == th->canrun) {
 			th->running = 0;
 			/* signal we're stopped */
-			pthread_cond_signal(&th->cond);
-			pthread_cond_wait(&th->cond, &th->lock);
+			cond_signal(&th->cond);
+			cond_wait(&th->cond, &th->lock);
 		}
 		th->running = 1;
 		/* signal we are running */
-		pthread_cond_signal(&th->cond);
-		pthread_mutex_unlock(&th->lock);
+		cond_signal(&th->cond);
+		mutex_unlock(&th->lock);
 
+		//iprintf("thread %x", th);
 		th->pool->func(th->pool->arg);
 	}
 
@@ -98,12 +99,12 @@ void* thread_main(void* _thread)
 
 static void thread_stop(struct thread* th)
 {
-	pthread_mutex_lock(&th->lock);
+	mutex_lock(&th->lock);
 	th->canrun = 0;
 	while (0 != th->running) {
-		pthread_cond_wait(&th->cond, &th->lock);
+		cond_wait(&th->cond, &th->lock);
 	}
-	pthread_mutex_unlock(&th->lock);
+	mutex_unlock(&th->lock);
 
 	th->pool->threads = th->next;
 	th->pool->nthreads--;
@@ -116,13 +117,13 @@ static void thread_start(struct thread* th, struct pool* pl)
 	pl->threads = th;
 	pl->nthreads++;
 
-	pthread_mutex_lock(&th->lock);
+	mutex_lock(&th->lock);
 	th->canrun = 1;
-	pthread_cond_signal(&th->cond);
+	cond_signal(&th->cond);
 	while (0 == th->running) {
-		pthread_cond_wait(&th->cond, &th->lock);
+		cond_wait(&th->cond, &th->lock);
 	}
-	pthread_mutex_unlock(&th->lock);
+	mutex_unlock(&th->lock);
 }
 
 /* -------------------------------------------------------------------------- */

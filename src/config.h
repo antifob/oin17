@@ -18,6 +18,8 @@
 #define OIN17_CONFIG_H
 /* ========================================================================== */
 
+#include "lib/config.h"
+
 #ifdef OIN17_RELEASE
 # define CA_URI		"wss://cscoins.2017.csgames.org:8989/client"
 #else /* !OIN17_RELEASE */
@@ -29,6 +31,14 @@
 
 /* Uncomment me if the wallet was successfully registered. */
 //#define WALLET_REGISTERED
+
+
+#define NONCEMIN	30000000
+#define NONCEMAX	CHAL_MAXNONCE
+
+#if NONCEMIN > NONCEMAX
+# error invalid nonces
+#endif
 
 /* ========================================================================== */
 #endif /* !OIN17_CONFIG_H */
